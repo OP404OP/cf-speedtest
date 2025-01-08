@@ -67,6 +67,5 @@ jobs:
           files: |
             artifacts/*.zip
             artifacts/*.tar.gz
-          body_path: release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
