@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+          
+      - name: Build
+        run: |
+          # 创建构建目录
+          mkdir -p build
+          
+          # 构建各平台二进制
+          GOOS=windows GOARCH=amd64 go build -o build/cfspeedtest_${GITHUB_REF_NAME}_windows_amd64.exe
+          GOOS=windows GOARCH=386 go build -o build/cfspeedtest_${GITHUB_REF_NAME}_windows_386.exe
+          GOOS=linux GOARCH=amd64 go build -o build/cfspeedtest_${GITHUB_REF_NAME}_linux_amd64
+          GOOS=linux GOARCH=386 go build -o build/cfspeedtest_${GITHUB_REF_NAME}_linux_386
+          GOOS=darwin GOARCH=amd64 go build -o build/cfspeedtest_${GITHUB_REF_NAME}_darwin_amd64
+          GOOS=darwin GOARCH=arm64 go build -o build/cfspeedtest_${GITHUB_REF_NAME}_darwin_arm64
+          
+          # 复制配置文件
+          cp -r configs build/
+          cp ip.txt build/
+          cp LICENSE build/
+          cp README.md build/
+          
+          # 打包
+          cd build
+          zip -r cfspeedtest_${GITHUB_REF_NAME}_windows_amd64.zip cfspeedtest_${GITHUB_REF_NAME}_windows_amd64.exe configs/ ip.txt LICENSE README.md
+          zip -r cfspeedtest_${GITHUB_REF_NAME}_windows_386.zip cfspeedtest_${GITHUB_REF_NAME}_windows_386.exe configs/ ip.txt LICENSE README.md
+          tar czf cfspeedtest_${GITHUB_REF_NAME}_linux_amd64.tar.gz cfspeedtest_${GITHUB_REF_NAME}_linux_amd64 configs/ ip.txt LICENSE README.md
+          tar czf cfspeedtest_${GITHUB_REF_NAME}_linux_386.tar.gz cfspeedtest_${GITHUB_REF_NAME}_linux_386 configs/ ip.txt LICENSE README.md
+          tar czf cfspeedtest_${GITHUB_REF_NAME}_darwin_amd64.tar.gz cfspeedtest_${GITHUB_REF_NAME}_darwin_amd64 configs/ ip.txt LICENSE README.md
+          tar czf cfspeedtest_${GITHUB_REF_NAME}_darwin_arm64.tar.gz cfspeedtest_${GITHUB_REF_NAME}_darwin_arm64 configs/ ip.txt LICENSE README.md
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/*.zip
+            build/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
