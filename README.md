@@ -16,7 +16,7 @@ Cloudflare CDN 节点测速工具，支持多节点测试。
 
 ## 下载安装
 
-从 [Releases](https://github.com/yourusername/cfspeedtest/releases) 页面下载对应平台的二进制文件：
+从 [Releases](https://github.com/OP404OP/cfspeedtest/releases) 页面下载对应平台的二进制文件：
 
 - Windows: `cfspeedtest_v1.0.0_windows_amd64.exe`
 - Linux: `cfspeedtest_v1.0.0_linux_amd64`
